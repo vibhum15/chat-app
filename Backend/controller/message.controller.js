@@ -1,5 +1,6 @@
 import Conversation from '../models/conversation.model.js';
 import Message from '../models/massage.model.js';
+import { getReceiverSocketId,io } from '../socket/socket.js';
 
 export async function sendMessages(req, res) {
       try{
@@ -27,7 +28,11 @@ export async function sendMessages(req, res) {
           conversation.messages.push(newMessage._id);
         }
         // socket io functionallity
-
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+          // io.to(<socket_id>).emit() used to send events to specific client
+          io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
 
         // await conversation.save();
         // await newMessage.save();
